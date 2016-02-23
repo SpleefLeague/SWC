@@ -47,28 +47,17 @@ public class Battle extends DBEntity implements DBLoadable, DBSaveable{
         this.reported = reported;
     }
     
-    public Participant getWinner() {
+    public Participant getFirst() {
         if(isOver()) {
-            Reference reference = score.getWinner();
-            if(reference == null) {
-                return null;
-            }
-            else {  
-                return reference.getReferenced();
-            }
+            return score.getFirst();
+            
         }
         return null;
     }
     
-    public Participant getLoser() {
+    public Participant getSecond() {
         if(isOver()) {
-            Reference reference = score.getLoser();
-            if(reference == null) {
-                return null;
-            }
-            else {  
-                return reference.getReferenced();
-            }
+            return score.getSecond();
         }
         return null;
     }
@@ -92,9 +81,9 @@ public class Battle extends DBEntity implements DBLoadable, DBSaveable{
         return getScore().isOver();
     }
     
-    public void end() {
+    public void end(Participant winner) {
         this.isRunning = false;
-        getScore().end();
+        getScore().end(winner);
     }
     
     public boolean isRunning() {

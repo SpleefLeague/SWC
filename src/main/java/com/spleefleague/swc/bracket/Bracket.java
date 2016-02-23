@@ -10,11 +10,11 @@ import com.spleefleague.core.io.DBLoad;
 import com.spleefleague.core.io.DBLoadable;
 import com.spleefleague.core.io.DBSave;
 import com.spleefleague.core.io.DBSaveable;
-import com.spleefleague.core.io.TypeConverter.UUIDStringConverter;
+import com.spleefleague.core.io.EntityBuilder;
 import com.spleefleague.swc.SWC;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.UUID;
+import org.bson.Document;
 
 /**
  *
@@ -22,9 +22,6 @@ import java.util.UUID;
  */
 public class Bracket extends DBEntity implements DBLoadable, DBSaveable{
     
-    @DBLoad(fieldName = "bracketID", typeConverter = UUIDStringConverter.class)
-    @DBSave(fieldName = "bracketID", typeConverter = UUIDStringConverter.class)
-    private UUID uuid;
     @DBLoad(fieldName = "hasStarted")
     @DBSave(fieldName = "hasStarted")
     private boolean hasStarted = false;
@@ -66,5 +63,14 @@ btls:   for(Battle battle : battles) {
             }
         }
         return open.toArray(new Battle[open.size()]);
+    }
+    
+    public void saveBattle(Battle battle) {
+        Document filter = new Document();
+        filter.put("_id", this.getObjectId());
+        filter.put("battles.uuid", battle.getUUID().toString());
+        Document update = new Document();
+        update.put("$set", new Document("battles.$", EntityBuilder.serialize(battle).get("$set", Document.class)));
+        SWC.getInstance().getPluginDB().getCollection("Brackets").updateOne(filter, update);
     }
 }

@@ -35,7 +35,7 @@ public class Reference extends DBEntity implements DBLoadable, DBSaveable {
     }
     
     public Participant getReferenced() {
-        return (winner) ? battle.getBattle().getWinner() : battle.getBattle().getLoser();
+        return (winner) ? battle.getBattle().getFirst() : battle.getBattle().getSecond();
     }
     
     public static class RootReference extends Reference {

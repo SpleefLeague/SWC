@@ -32,9 +32,13 @@ public class Score extends DBEntity implements DBLoadable, DBSaveable {
     @DBSave(fieldName = "isOver")
     @DBLoad(fieldName = "isOver")
     private boolean isOver = false;
+    @DBSave(fieldName = "winner", typeConverter = TypeConverter.UUIDStringConverter.class)
+    @DBLoad(fieldName = "winner", typeConverter = TypeConverter.UUIDStringConverter.class)
+    private UUID winner;
     
-    public void end(){
+    public void end(Participant winner){
         isOver = true;
+        this.winner = winner.getPID();
     }
     
     protected void reset() {
@@ -69,38 +73,31 @@ public class Score extends DBEntity implements DBLoadable, DBSaveable {
         return -1;
     }
     
-    public Reference getWinner() {
-        Reference winner = null;
+    public Participant getFirst() {
+        Participant winner = null;
         if(isOver){
-            for(Reference r : scores.keySet()) {
-                if(winner == null) {
-                    winner = r;
-                }
-                else {
-                    if(scores.get(r) > scores.get(winner)) {
-                        winner = r;
-                    }
-                }
-            }
+            winner = Participant.getByPID(this.winner);
         }
         return winner;
     }
     
-    public Reference getLoser() {
-        Reference loser = null;
+    public Participant getSecond() {
+        Participant second = null;
+        int points = -1;
         if(isOver){
-            for(Reference r : scores.keySet()) {
-                if(loser == null) {
-                    loser = r;
-                }
-                else {
-                    if(scores.get(r) <= scores.get(loser)) {
-                        loser = r;
+            for(Entry<Reference, Integer> entry : scores.entrySet()) {
+                Participant referenced = entry.getKey().getReferenced();
+                if(referenced != null) {
+                    if(referenced.getPID() != winner) {
+                        if(entry.getValue() > points) {
+                            second = referenced;
+                            points = entry.getValue();
+                        }
                     }
                 }
             }
         }
-        return loser;
+        return second;
     }
     
     public boolean isOver() {

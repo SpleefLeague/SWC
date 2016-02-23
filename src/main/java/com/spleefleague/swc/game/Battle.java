@@ -28,6 +28,7 @@ import com.spleefleague.core.plugin.GamePlugin;
 import com.spleefleague.core.utils.FakeArea;
 import com.spleefleague.core.utils.FakeBlock;
 import com.spleefleague.swc.SWC;
+import com.spleefleague.swc.bracket.Participant;
 import com.spleefleague.swc.player.SWCPlayer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -217,7 +218,8 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         }
         else if(reason != EndReason.ENDGAME) {
             announceWinner(winner);
-            match.end();
+            match.end(winner.getTournamentParticipant());
+            SWC.getInstance().getBracket().saveBattle(match);
         }
         else {
             match.reset();

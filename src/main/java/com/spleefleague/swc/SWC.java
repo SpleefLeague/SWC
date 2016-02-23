@@ -62,6 +62,11 @@ public class SWC extends GamePlugin {
         end = ChatChannel.valueOf("GAME_MESSAGE_SWC_END");
     }
     
+    @Override
+    public void stop() {
+        EntityBuilder.save(bracket, getPluginDB().getCollection("Brackets"));
+    }
+    
     public PlayerManager<SWCPlayer> getPlayerManager() {
         return playerManager;
     }
