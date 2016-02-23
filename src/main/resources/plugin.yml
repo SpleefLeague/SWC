@@ -1,0 +1,11 @@
+name: SWC
+author: SpleefLeague
+authors: [Joba, Akaiyo, Manuman]
+main: com.spleefleague.swc.SWC
+version: 1.0
+depend: [SpleefLeagueCore]
+commands:    
+    ready:
+        usage: /<command>
+    reset:
+        usage: /<command>
