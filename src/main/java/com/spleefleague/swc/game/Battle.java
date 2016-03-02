@@ -25,10 +25,10 @@ import com.spleefleague.core.player.PlayerState;
 import com.spleefleague.core.player.Rank;
 import com.spleefleague.core.player.SLPlayer;
 import com.spleefleague.core.plugin.GamePlugin;
+import com.spleefleague.core.utils.Area;
 import com.spleefleague.core.utils.FakeArea;
 import com.spleefleague.core.utils.FakeBlock;
 import com.spleefleague.swc.SWC;
-import com.spleefleague.swc.bracket.Participant;
 import com.spleefleague.swc.player.SWCPlayer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -80,8 +80,10 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         this.data = new LinkedHashMap<>();
         this.spawnCages = new FakeArea();
         this.field = new FakeArea();
-        for(Block block : arena.getField().getBlocks()) {
-            this.field.addBlock(new FakeBlock(block.getLocation(), Material.SNOW_BLOCK));
+        for(Area area : arena.getField()) {
+            for(Block block : area.getBlocks()) {
+                this.field.addBlock(new FakeBlock(block.getLocation(), Material.SNOW_BLOCK));
+            }
         }
         this.cc = ChatChannel.createTemporaryChannel("GAMECHANNEL" + this.hashCode(), null, Rank.DEFAULT, false, false);
     }

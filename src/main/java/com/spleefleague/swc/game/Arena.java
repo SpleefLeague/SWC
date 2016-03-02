@@ -47,7 +47,7 @@ public class Arena extends DBEntity implements DBLoadable, DBSaveable, Queueable
     
     @DBLoad(fieldName = "border")
     private Area border;
-    private Area field;
+    private Area[] field;
     @DBLoad(fieldName = "spawns", typeConverter = TypeConverter.LocationConverter.class)
     private Location[] spawns;
     @DBLoad(fieldName = "creator")
@@ -86,16 +86,18 @@ public class Arena extends DBEntity implements DBLoadable, DBSaveable, Queueable
     }
     
     @DBLoad(fieldName = "field")
-    public void setField(Area field) {
+    public void setField(Area[] field) {
         this.field = field;
         defaultSnow = new FakeArea();
-        for(Block block : field.getBlocks()) {
-            defaultSnow.addBlock(new FakeBlock(block.getLocation(), Material.SNOW_BLOCK));
+        for(Area area : field) {
+            for(Block block : area.getBlocks()) {
+                defaultSnow.addBlock(new FakeBlock(block.getLocation(), Material.SNOW_BLOCK));
+            }
         }
         FakeBlockHandler.addArea(defaultSnow, false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
     }
     
-    public Area getField() {
+    public Area[] getField() {
         return field;
     }
     
