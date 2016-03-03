@@ -28,9 +28,7 @@ public class SWCQueue {
     
     public SWCQueue() {
         this.random = new Random();
-        tickTask = Bukkit.getScheduler().runTaskTimer(SWC.getInstance(), () -> {
-            doTick();
-        }, 0, 5 * 20);
+        tickTask = Bukkit.getScheduler().runTaskTimer(SWC.getInstance(), this::doTick, 0, 5 * 20);
     }
     
     private void doTick() {

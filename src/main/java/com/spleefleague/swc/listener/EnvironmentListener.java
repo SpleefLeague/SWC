@@ -45,8 +45,6 @@ public class EnvironmentListener implements Listener {
     
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent event) {
-        for(Arena arena : Arena.getAll()) {
-            FakeBlockHandler.addArea(arena.getDefaultSnow(), false, event.getPlayer());
-        }
+        Arena.getAll().stream().filter(arena -> arena != null && arena.getDefaultSnow() != null).forEach(arena -> FakeBlockHandler.addArea(arena.getDefaultSnow(), false, event.getPlayer()));
     }
 }

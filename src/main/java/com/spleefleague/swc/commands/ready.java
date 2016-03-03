@@ -29,7 +29,7 @@ public class ready extends BasicCommand {
             SWCPlayer swcp = SWC.getInstance().getPlayerManager().get(p);
             if(swcp.isReady()) {
                 swcp.setReady(false);
-                success(p, "You are not ready anymore.");
+                success(p, "You are no longer ready.");
             }
             else {
                 swcp.setReady(true);

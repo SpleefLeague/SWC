@@ -92,7 +92,7 @@ public class GameListener implements Listener {
     public void onBlockBreak(FakeBlockBreakEvent event) {
         SWCPlayer sp = SWC.getInstance().getPlayerManager().get(event.getPlayer());
         if(sp.isIngame()) {
-            if(sp.getCurrentBattle().isInCountdown()) {
+            if(sp.getCurrentBattle().isInCountdown() || !sp.getCurrentBattle().getDisconnectPlayers().isEmpty()) {
                 event.setCancelled(true);
             }
             else {

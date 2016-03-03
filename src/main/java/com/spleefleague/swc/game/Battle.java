@@ -62,7 +62,7 @@ import org.bukkit.scoreboard.Scoreboard;
 public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlayer> {
 
     private final Arena arena;
-    private final List<SWCPlayer> players, spectators;
+    private final List<SWCPlayer> players, spectators, disconnects;
     private final Map<SWCPlayer, PlayerData> data;
     private final ChatChannel cc;
     private int ticksPassed = 0;
@@ -77,6 +77,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         this.arena = arena;
         this.players = players;
         this.spectators = new ArrayList<>();
+        this.disconnects = new ArrayList<>();
         this.data = new LinkedHashMap<>();
         this.spawnCages = new FakeArea();
         this.field = new FakeArea();
@@ -97,6 +98,10 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
 
     public Collection<SWCPlayer> getPlayers() {
         return players;
+    }
+
+    public Collection<SWCPlayer> getDisconnectPlayers() {
+        return disconnects;
     }
 
     public boolean isNormalSpleef() {
@@ -158,6 +163,61 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         resetPlayer(sp);
     }
 
+    /**
+     * Called when a player quits - handles cooldown/reconnection.
+     *
+     * @param sp player quitting.
+     */
+    public void playerQuit(final SWCPlayer sp) {
+        players.remove(sp);
+        disconnects.add(sp);
+        sp.setDisconnectLocation(sp.getLocation());
+        getActivePlayers().forEach((SWCPlayer swcPlayer) -> swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.ERROR.buildTheme(false) + sp.getName() + " has left the game, and has 2.5 minutes to reconnect."));
+        Bukkit.getScheduler().runTaskLater(SWC.getInstance(), () -> {
+            for(SWCPlayer swcPlayer : players) {
+                if(swcPlayer.getUniqueId().equals(sp.getUniqueId())) {
+                    if(disconnects.contains(sp)) {
+                        //Failsafe.
+                        disconnects.remove(sp);
+                    }
+                    return;
+                }
+            }
+            disconnects.remove(sp);
+            removePlayer(sp, false);
+        }, 3000);
+    }
+
+    /**
+     * Handle disconnected player re-join.
+     *
+     * @param sp player re-joining.
+     * @param slp slPlayer re-joining.
+     * @param oldLocation player's old location.
+     */
+    public void rejoin(SWCPlayer sp, SLPlayer slp, Location oldLocation) {
+        disconnects.removeIf((SWCPlayer swcPlayer) -> swcPlayer.getUniqueId().equals(sp.getUniqueId()));
+        getActivePlayers().forEach((SWCPlayer swcPlayer) -> {
+            swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.SUCCESS.buildTheme(false) + sp.getName() + " has re-joined the game!");
+            swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.SUCCESS.buildTheme(false) + "The battle has been resumed!");
+            FakeBlockHandler.addBlock(new FakeBlock(swcPlayer.getLocation().clone().subtract(0, 1, 0), Material.SNOW_BLOCK), true, players.toArray(new SWCPlayer[players.size()]));
+            swcPlayer.showPlayer(sp);
+            sp.showPlayer(swcPlayer);
+        });
+
+        players.add(sp);
+        FakeBlockHandler.addArea(spawnCages, sp.getPlayer());
+        FakeBlockHandler.addArea(field, sp.getPlayer());
+        FakeBlockHandler.removeArea(arena.getDefaultSnow(), false, sp.getPlayer());
+        FakeBlockHandler.addBlock(new FakeBlock(oldLocation.clone().subtract(0, 1, 0), Material.SNOW_BLOCK), true, players.toArray(new SWCPlayer[players.size()]));
+        sp.setIngame(true);
+        sp.setReady(false);
+        slp.setState(PlayerState.INGAME);
+        slp.addChatChannel(cc);
+        sp.setScoreboard(scoreboard);
+        sp.teleport(oldLocation);
+    }
+
     public void removePlayer(SWCPlayer sp, boolean surrender) {
         if(!surrender) {
             for (SWCPlayer pl : getActivePlayers()) {
@@ -187,6 +247,9 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
 
     private void resetPlayer(SWCPlayer sp) {
         SLPlayer slp = SpleefLeague.getInstance().getPlayerManager().get(sp.getPlayer());
+        if(slp == null) {
+            return;
+        }
         FakeBlockHandler.removeArea(spawnCages, slp.getPlayer());
         FakeBlockHandler.removeArea(field, false, slp.getPlayer());
         FakeBlockHandler.addArea(arena.getDefaultSnow(), false, slp.getPlayer());
@@ -254,7 +317,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     }
 
     public void onArenaLeave(SWCPlayer player) {
-        if (isInCountdown()) {
+        if (isInCountdown() || !getDisconnectPlayers().isEmpty()) {
             player.teleport(data.get(player).getSpawn());
         }
         else {
