@@ -13,7 +13,9 @@ import com.spleefleague.core.io.DBSaveable;
 import com.spleefleague.core.io.TypeConverter.UUIDStringConverter;
 import com.spleefleague.swc.bracket.Reference.ReferenceConverter;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
+import org.bson.Document;
 
 /**
  *
