@@ -174,7 +174,10 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         players.remove(sp);
         disconnects.add(sp);
         sp.setDisconnectLocation(sp.getLocation());
-        getActivePlayers().forEach((SWCPlayer swcPlayer) -> swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.ERROR.buildTheme(false) + sp.getName() + " has left the game, and has 2.5 minutes to reconnect."));
+        getActivePlayers().forEach((SWCPlayer swcPlayer) -> {
+            swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.ERROR.buildTheme(false) + sp.getName() + " has left the game, and has 2.5 minutes to reconnect.");
+            disconnectFreeze(swcPlayer);
+        });
         Bukkit.getScheduler().runTaskLater(SWC.getInstance(), () -> {
             for(SWCPlayer swcPlayer : players) {
                 if(swcPlayer.getUniqueId().equals(sp.getUniqueId())) {
@@ -190,6 +193,14 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         }, 3000);
     }
 
+    private void disconnectFreeze(SWCPlayer swcPlayer) {
+        swcPlayer.setAllowFlight(true);
+        swcPlayer.setFlying(true);
+        swcPlayer.setFlySpeed(0);
+        swcPlayer.teleport(swcPlayer.getLocation().add(0, 0.1 ,0));
+        swcPlayer.getInventory().clear();
+    }
+
     /**
      * Handle disconnected player re-join.
      *
@@ -199,15 +210,31 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
      */
     public void rejoin(SWCPlayer sp, SLPlayer slp, Location oldLocation) {
         disconnects.removeIf((SWCPlayer swcPlayer) -> swcPlayer.getUniqueId().equals(sp.getUniqueId()));
+        disconnectFreeze(sp);
+        sp.getInventory().clear();
         getActivePlayers().forEach((SWCPlayer swcPlayer) -> {
             swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.SUCCESS.buildTheme(false) + sp.getName() + " has re-joined the game!");
             swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.SUCCESS.buildTheme(false) + "The battle has been resumed!");
             FakeBlockHandler.addBlock(new FakeBlock(swcPlayer.getLocation().clone().subtract(0, 1, 0), Material.SNOW_BLOCK), true, players.toArray(new SWCPlayer[players.size()]));
-            swcPlayer.showPlayer(sp);
             sp.showPlayer(swcPlayer);
+            swcPlayer.showPlayer(sp);
         });
-
         players.add(sp);
+        PlayerData playerData = null;
+        for(PlayerData pd : data.values()) {
+            if(pd.getPlayer().getUniqueId().equals(sp.getUniqueId())) {
+                playerData = pd;
+                break;
+            }
+        }
+        if(playerData == null) {
+            getActivePlayers().forEach((SWCPlayer swcPlayer) -> swcPlayer.kickPlayer("An error occurred (no PlayerData)."));
+            cancel();
+            return;
+        }
+        data.values().remove(playerData);
+        playerData.setSWCPlayer(sp);
+        data.put(sp, playerData);
         FakeBlockHandler.addArea(spawnCages, sp.getPlayer());
         FakeBlockHandler.addArea(field, sp.getPlayer());
         FakeBlockHandler.removeArea(arena.getDefaultSnow(), false, sp.getPlayer());
@@ -218,6 +245,40 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         slp.addChatChannel(cc);
         sp.setScoreboard(scoreboard);
         sp.teleport(oldLocation);
+        sp.setGameMode(GameMode.ADVENTURE);
+        BukkitRunnable br = new BukkitRunnable() {
+
+            private int secondsLeft = 3;
+
+            @Override
+            public void run() {
+                if (secondsLeft > 0) {
+                    ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), secondsLeft + "...", cc);
+                    secondsLeft--;
+                }
+                else {
+                    ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), "GO!", cc);
+                    for (SWCPlayer sp : getActivePlayers()) {
+                        sp.setFrozen(false);
+                    }
+                    onDone();
+                    super.cancel();
+                }
+            }
+
+            public void onDone() {
+                for (SWCPlayer sp : getActivePlayers()) {
+                    sp.teleport(getData(sp).getSpawn().clone().add(0, 0.3, 0));
+                    sp.setFrozen(false);
+                    sp.setFlying(false);
+                    sp.setAllowFlight(false);
+                    sp.getInventory().setItem(0, getShovel());
+                }
+                inCountdown = false;
+            }
+
+        };
+        br.runTaskTimer(SWC.getInstance(), 20, 20);
     }
 
     public void removePlayer(SWCPlayer sp, boolean surrender) {
@@ -391,6 +452,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
                 else {
                     playerNames += ChatColor.GREEN + ", " + ChatColor.RED + sp.getName();
                 }
+                sp.setWalkSpeed(0.2F);
                 match.getScore().setScore(0, sp.getTournamentParticipant());    
                 sp.setReady(false);
                 sp.setIngame(true);
@@ -507,7 +569,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         clock = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!isInCountdown()) {
+                if (!isInCountdown() && !getDisconnectPlayers().isEmpty()) {
                     ticksPassed++;
                     updateScoreboardTime();
                 }
@@ -603,9 +665,9 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
 
     public static class PlayerData {
 
+        private SWCPlayer sp;
         private int points;
         private final Location spawn;
-        private final SWCPlayer sp;
         private final GameMode oldGamemode;
         private final ItemStack[] oldInventory;
 
@@ -632,6 +694,10 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
 
         public SWCPlayer getPlayer() {
             return sp;
+        }
+
+        public void setSWCPlayer(SWCPlayer swcPlayer) {
+            this.sp = swcPlayer;
         }
 
         public void restoreOldData() {

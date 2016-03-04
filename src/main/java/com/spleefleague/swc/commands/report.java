@@ -47,6 +47,7 @@ public class report extends BasicCommand {
                 Battle battle = Battle.getByUUID(uuid);
                 if(battle != null && battle.isOver()) {
                     battle.setReported(true);
+                    success(slp, "This battle has been set to reported!");
                 }
                 else {
                     error(p, "Please don't call this command manually.");
