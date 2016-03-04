@@ -212,6 +212,10 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     public void rejoin(SWCPlayer sp, SLPlayer slp, Location oldLocation) {
         disconnects.removeIf((SWCPlayer swcPlayer) -> swcPlayer.getUniqueId().equals(sp.getUniqueId()));
         sp.getInventory().clear();
+        Bukkit.getOnlinePlayers().forEach((Player p) -> {
+            p.hidePlayer(slp);
+            slp.hidePlayer(p);
+        });
         getActivePlayers().forEach((SWCPlayer swcPlayer) -> {
             swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.SUCCESS.buildTheme(false) + sp.getName() + " has re-joined the game!");
             swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.SUCCESS.buildTheme(false) + "The battle has been resumed!");
