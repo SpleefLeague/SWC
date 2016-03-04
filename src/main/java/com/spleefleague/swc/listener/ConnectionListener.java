@@ -60,7 +60,7 @@ public class ConnectionListener implements Listener {
             SWCPlayer swcPlayer = SWC.getInstance().getPlayerManager().get(e.getPlayer());
             for (Battle battle : SWC.getInstance().getBattleManager().getAll()) {
                 for (SWCPlayer player : battle.getDisconnectPlayers()) {
-                    if (player.getUniqueId().equals(swcPlayer.getUniqueId())) {
+                    if (player != null && swcPlayer != null && player.getUniqueId().equals(swcPlayer.getUniqueId())) {
                         battle.rejoin(swcPlayer, (SLPlayer) e.getGeneralPlayer(), player.getDisconnectLocation());
                         return;
                     }

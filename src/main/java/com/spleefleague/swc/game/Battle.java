@@ -194,6 +194,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     }
 
     private void disconnectFreeze(SWCPlayer swcPlayer) {
+        swcPlayer.setFrozen(true);
         swcPlayer.setAllowFlight(true);
         swcPlayer.setFlying(true);
         swcPlayer.setFlySpeed(0);
@@ -210,7 +211,6 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
      */
     public void rejoin(SWCPlayer sp, SLPlayer slp, Location oldLocation) {
         disconnects.removeIf((SWCPlayer swcPlayer) -> swcPlayer.getUniqueId().equals(sp.getUniqueId()));
-        disconnectFreeze(sp);
         sp.getInventory().clear();
         getActivePlayers().forEach((SWCPlayer swcPlayer) -> {
             swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.SUCCESS.buildTheme(false) + sp.getName() + " has re-joined the game!");
@@ -246,6 +246,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         sp.setScoreboard(scoreboard);
         sp.teleport(oldLocation);
         sp.setGameMode(GameMode.ADVENTURE);
+        disconnectFreeze(sp);
         BukkitRunnable br = new BukkitRunnable() {
 
             private int secondsLeft = 3;
@@ -569,7 +570,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         clock = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!isInCountdown() && !getDisconnectPlayers().isEmpty()) {
+                if (!isInCountdown() && getDisconnectPlayers().isEmpty()) {
                     ticksPassed++;
                     updateScoreboardTime();
                 }
