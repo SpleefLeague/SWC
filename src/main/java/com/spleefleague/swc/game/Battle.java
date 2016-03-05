@@ -175,7 +175,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         disconnects.add(sp);
         sp.setDisconnectLocation(sp.getLocation());
         getActivePlayers().forEach((SWCPlayer swcPlayer) -> {
-            swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.ERROR.buildTheme(false) + sp.getName() + " has left the game, and has 2.5 minutes to reconnect.");
+            swcPlayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.ERROR.buildTheme(false) + sp.getName() + " has left the game, and has 5 minutes to reconnect.");
             disconnectFreeze(swcPlayer);
         });
         Bukkit.getScheduler().runTaskLater(SWC.getInstance(), () -> {
@@ -190,7 +190,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
             }
             disconnects.remove(sp);
             removePlayer(sp, false);
-        }, 3000);
+        }, 6000);
     }
 
     private void disconnectFreeze(SWCPlayer swcPlayer) {
