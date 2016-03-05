@@ -28,7 +28,7 @@ import org.bukkit.entity.Player;
 public class report extends BasicCommand {
 
     public report(CorePlugin plugin, String name, String usage) {
-        super(plugin, name, usage, Rank.SENIOR_MODERATOR);
+        super(plugin, name, usage);
     }
 
     @Override
@@ -47,7 +47,6 @@ public class report extends BasicCommand {
                 Battle battle = Battle.getByUUID(uuid);
                 if(battle != null && battle.isOver()) {
                     battle.setReported(true);
-                    success(slp, "This battle has been set to reported!");
                 }
                 else {
                     error(p, "Please don't call this command manually.");
@@ -60,19 +59,20 @@ public class report extends BasicCommand {
             sendUsage(p);
         }
     }
-    
+
     private BaseComponent[] getReportMessage(Battle battle) {
         String first = DatabaseConnection.getUsername(battle.getFirst().getMCID());
         String second = DatabaseConnection.getUsername(battle.getSecond().getMCID());
         BaseComponent[] message = new ComponentBuilder(SWC.getInstance().getChatPrefix() + " ")
-            .append(first).color(net.md_5.bungee.api.ChatColor.GREEN)
-            .append(" (" + battle.getScore().getScore(battle.getFirst()) + ")").color(ChatColor.GRAY.asBungee())
-            .append(" vs. ").color(net.md_5.bungee.api.ChatColor.DARK_GRAY)
-            .append(second).color(net.md_5.bungee.api.ChatColor.RED)
-            .append(" (" + battle.getScore().getScore(battle.getFirst()) + ")").color(ChatColor.GRAY.asBungee())
-            .append(" - ").color(net.md_5.bungee.api.ChatColor.DARK_GRAY)
-            .append("[").color(ChatColor.GRAY.asBungee()).append("Reported").color(ChatColor.GOLD.asBungee()).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/report " + battle.getUUID().toString())).append("]").color(ChatColor.GRAY.asBungee())
-            .create();
+                .append(first).color(net.md_5.bungee.api.ChatColor.GREEN)
+                .append(" (" + battle.getScore().getScore(battle.getFirst()) + ")").color(ChatColor.GRAY.asBungee())
+                .append(" vs. ").color(net.md_5.bungee.api.ChatColor.DARK_GRAY)
+                .append(second).color(net.md_5.bungee.api.ChatColor.RED)
+                .append(" (" + battle.getScore().getScore(battle.getSecond()) + ")").color(ChatColor.GRAY.asBungee())
+                .append(" - ").color(net.md_5.bungee.api.ChatColor.DARK_GRAY)
+                .append("[").color(ChatColor.GRAY.asBungee()).append("Reported").color(ChatColor.GOLD.asBungee()).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/report " + battle.getUUID().toString())).append("]").color(ChatColor.GRAY.asBungee())
+                .create();
         return message;
     }
+
 }

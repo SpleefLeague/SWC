@@ -35,13 +35,12 @@ public class matches extends BasicCommand {
             ComponentBuilder message = new ComponentBuilder(SWC.getInstance().getChatPrefix());
             battle.getActivePlayers().forEach((SWCPlayer swcPlayer) -> {
                 message.append(" " + swcPlayer.getName()).color(net.md_5.bungee.api.ChatColor.GREEN);
-                if(battle.getActivePlayers().indexOf(swcPlayer) != battle.getActivePlayers().size()) {
+                if(battle.getActivePlayers().indexOf(swcPlayer) != (battle.getActivePlayers().size() -1)) {
                     message.append(" vs. ").color(net.md_5.bungee.api.ChatColor.DARK_GRAY);
                 }
             });
             message.append(" - ").color(net.md_5.bungee.api.ChatColor.DARK_GRAY)
-                    .append("[").color(ChatColor.GRAY.asBungee()).append("Click to Spectate").color(ChatColor.GOLD.asBungee()).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/spectate " + battle.getActivePlayers().get(0).getName())).append("]").color(ChatColor.GRAY.asBungee())
-                    .create();
+                    .append("[Click to Spectate]").color(ChatColor.GOLD.asBungee()).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/spectate " + battle.getActivePlayers().get(0).getName())).create();
             player.spigot().sendMessage(message.create());
         });
     }
