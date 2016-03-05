@@ -1,6 +1,6 @@
 name: SWC
 author: SpleefLeague
-authors: [Joba, Akaiyo, Manuman]
+authors: [Joba, Akaiyo, Manuman, JoshK_]
 main: com.spleefleague.swc.SWC
 version: 1.0
 depend: [SpleefLeagueCore]
@@ -10,4 +10,6 @@ commands:
     reset:
         usage: /<command>
     report:
+        usage: /<command>
+    matches:
         usage: /<command>
