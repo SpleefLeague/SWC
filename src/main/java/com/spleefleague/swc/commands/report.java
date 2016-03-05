@@ -16,7 +16,6 @@ import java.util.UUID;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
@@ -68,7 +67,7 @@ public class report extends BasicCommand {
             .append(" (" + battle.getScore().getScore(battle.getFirst()) + ")").color(ChatColor.GRAY.asBungee())
             .append(" vs. ").color(net.md_5.bungee.api.ChatColor.DARK_GRAY)
             .append(second).color(net.md_5.bungee.api.ChatColor.RED)
-            .append(" (" + battle.getScore().getScore(battle.getFirst()) + ")").color(ChatColor.GRAY.asBungee())
+            .append(" (" + battle.getScore().getScore(battle.getSecond()) + ")").color(ChatColor.GRAY.asBungee())
             .append(" - ").color(net.md_5.bungee.api.ChatColor.DARK_GRAY)
             .append("[").color(ChatColor.GRAY.asBungee()).append("Reported").color(ChatColor.GOLD.asBungee()).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/report " + battle.getUUID().toString())).append("]").color(ChatColor.GRAY.asBungee())
             .create();
