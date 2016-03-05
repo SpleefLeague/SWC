@@ -22,9 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 
 /**
  *
@@ -83,7 +81,7 @@ public class GameListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onInteract(PlayerInteractEvent event) {
         SWCPlayer sp = SWC.getInstance().getPlayerManager().get(event.getPlayer());
-        if(sp.isIngame()) {
+        if(sp != null && sp.isIngame()) {
             event.setCancelled(event.getClickedBlock() != null && event.getClickedBlock().getType() != Material.SNOW_BLOCK);
         }
     }
@@ -92,7 +90,7 @@ public class GameListener implements Listener {
     public void onBlockBreak(FakeBlockBreakEvent event) {
         SWCPlayer sp = SWC.getInstance().getPlayerManager().get(event.getPlayer());
         if(sp.isIngame()) {
-            if(sp.getCurrentBattle().isInCountdown()) {
+            if(sp.getCurrentBattle().isInCountdown() || !sp.getCurrentBattle().getDisconnectPlayers().isEmpty()) {
                 event.setCancelled(true);
             }
             else {
@@ -112,6 +110,22 @@ public class GameListener implements Listener {
     @EventHandler
     public void onFood(FoodLevelChangeEvent event) {
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onShift(PlayerToggleSneakEvent e) {
+        SWCPlayer sp = SWC.getInstance().getPlayerManager().get(e.getPlayer());
+        if(sp.isIngame() && !sp.getCurrentBattle().getDisconnectPlayers().isEmpty()) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onShift(PlayerToggleFlightEvent e) {
+        SWCPlayer sp = SWC.getInstance().getPlayerManager().get(e.getPlayer());
+        if(sp.isIngame() && !sp.getCurrentBattle().getDisconnectPlayers().isEmpty()) {
+            e.setCancelled(true);
+        }
     }
     
     private <T> boolean strongContains(Collection<T> col, T object) {

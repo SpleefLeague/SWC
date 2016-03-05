@@ -9,13 +9,15 @@ import com.spleefleague.core.player.GeneralPlayer;
 import com.spleefleague.swc.SWC;
 import com.spleefleague.swc.bracket.Participant;
 import com.spleefleague.swc.game.Battle;
+import org.bukkit.Location;
 
 /**
  *
  * @author Jonas
  */
 public class SWCPlayer extends GeneralPlayer {
-    
+
+    private Location disconnectLocation;
     private boolean ingame, frozen, requestingReset, requestingEndgame, ready;
     
     public Participant getTournamentParticipant() {
@@ -68,7 +70,15 @@ public class SWCPlayer extends GeneralPlayer {
         }
         return null;
     }
-    
+
+    public Location getDisconnectLocation() {
+        return disconnectLocation;
+    }
+
+    public void setDisconnectLocation(Location disconnectLocation) {
+        this.disconnectLocation = disconnectLocation;
+    }
+
     @Override
     public void setDefaults() {
         super.setDefaults();
@@ -77,5 +87,6 @@ public class SWCPlayer extends GeneralPlayer {
         this.ready = false;
         this.requestingEndgame = false;
         this.requestingReset = false;
+        this.disconnectLocation = null;
     }
 }

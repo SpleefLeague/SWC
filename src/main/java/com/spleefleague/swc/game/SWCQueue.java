@@ -25,14 +25,14 @@ public class SWCQueue {
 
     private final Random random;
     private final BukkitTask tickTask;
-    
+
     public SWCQueue() {
         this.random = new Random();
         tickTask = Bukkit.getScheduler().runTaskTimer(SWC.getInstance(), () -> {
             doTick();
         }, 0, 5 * 20);
     }
-    
+
     private void doTick() {
         List<com.spleefleague.swc.bracket.Battle> battles = Arrays.asList(SWC.getInstance().getBracket().getPlayableBattles());
         PlayerManager<SWCPlayer> pm = SWC.getInstance().getPlayerManager();
