@@ -27,7 +27,7 @@ import org.bukkit.entity.Player;
 public class report extends BasicCommand {
 
     public report(CorePlugin plugin, String name, String usage) {
-        super(plugin, name, usage, Rank.SENIOR_MODERATOR);
+        super(plugin, name, usage, Rank.MODERATOR);
     }
 
     @Override

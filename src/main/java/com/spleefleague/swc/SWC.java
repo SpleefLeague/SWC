@@ -40,7 +40,6 @@ public class SWC extends GamePlugin {
     private Bracket bracket;
     private PlayerManager<SWCPlayer> playerManager;
     private SWCBattleManager battleManager;
-    private ChatChannel start, end;
     
     public SWC() {
         super("[SWC]", ChatColor.GRAY + "[" + ChatColor.GOLD + "SWC" + ChatColor.GRAY + "]" + ChatColor.RESET);
@@ -58,8 +57,6 @@ public class SWC extends GamePlugin {
         playerManager = new PlayerManager<>(this, SWCPlayer.class);
         battleManager = new SWCBattleManager();
         CommandLoader.loadCommands(this, "com.spleefleague.swc.commands");
-        start = ChatChannel.valueOf("GAME_MESSAGE_SWC_START");
-        end = ChatChannel.valueOf("GAME_MESSAGE_SWC_END");
     }
     
     @Override
@@ -77,14 +74,6 @@ public class SWC extends GamePlugin {
     
     public Bracket getBracket() {
         return bracket;
-    }
-
-    public ChatChannel getEndMessageChannel() {
-        return end;
-    }
-
-    public ChatChannel getStartMessageChannel() {
-        return start;
     }
 
     @Override

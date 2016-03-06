@@ -452,10 +452,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
                     playerNames = ChatColor.RED + sp.getName();
                 }
                 else if (i == players.size() - 1) {
-                    playerNames += ChatColor.GREEN + " and " + ChatColor.RED + sp.getName();
-                }
-                else {
-                    playerNames += ChatColor.GREEN + ", " + ChatColor.RED + sp.getName();
+                    playerNames += ChatColor.YELLOW + " vs. " + ChatColor.RED + sp.getName();
                 }
                 sp.setWalkSpeed(0.2F);
                 match.getScore().setScore(0, sp.getTournamentParticipant());    
@@ -489,7 +486,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
                 scoreboard.getObjective("rounds").getScore(sp.getName()).setScore(data.get(sp).getPoints());
                 slp.setState(PlayerState.INGAME);
             }
-            ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), Theme.SUCCESS.buildTheme(false) + "Beginning match on " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " between " + ChatColor.RED + playerNames + ChatColor.GREEN + "!", SWC.getInstance().getStartMessageChannel());
+            Bukkit.broadcastMessage(SWC.getInstance().getChatPrefix() + " " + ChatColor.RED + arena.getName() + ChatColor.YELLOW + " - " + playerNames + ChatColor.YELLOW + "!");
             getSpawnCageBlocks();
             FakeBlockHandler.addArea(spawnCages, false, GeneralPlayer.toBukkitPlayer(players.toArray(new SWCPlayer[players.size()])));
             hidePlayers();
@@ -637,10 +634,10 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
             }
         }
         if(loser != null) {
-            ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), ChatColor.GREEN + "Game in arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " is over. " + ChatColor.RED + winner.getName() + ChatColor.GREEN + " has won against " + ChatColor.RED + loser.getName() + "!", SWC.getInstance().getEndMessageChannel());
+            Bukkit.broadcastMessage(SWC.getInstance().getChatPrefix() + " " + ChatColor.RED + winner.getName() + ChatColor.YELLOW + " won against " + ChatColor.RED + loser.getName());
         }
         else {
-            ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), ChatColor.GREEN + "Game in arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " is over. " + ChatColor.RED + winner.getName() + ChatColor.GREEN + " has won the match!", SWC.getInstance().getEndMessageChannel());
+            Bukkit.broadcastMessage(SWC.getInstance().getChatPrefix() + " " + ChatColor.RED + winner.getName() + ChatColor.YELLOW + " has won the match!");
         }
     }
 
