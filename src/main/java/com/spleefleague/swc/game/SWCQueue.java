@@ -37,25 +37,24 @@ public class SWCQueue {
         List<com.spleefleague.swc.bracket.Battle> battles = Arrays.asList(SWC.getInstance().getBracket().getPlayableBattles());
         PlayerManager<SWCPlayer> pm = SWC.getInstance().getPlayerManager();
         List<Arena> free = new ArrayList<>();
-        for(Arena arena : Arena.getAll()) {
-            if(!arena.isOccupied() && !arena.isPaused()) {
+        for (Arena arena : Arena.getAll()) {
+            if (!arena.isOccupied() && !arena.isPaused()) {
                 free.add(arena);
             }
         }
-        for(com.spleefleague.swc.bracket.Battle battle : battles) {
+        for (com.spleefleague.swc.bracket.Battle battle : battles) {
             List<SWCPlayer> participants = new ArrayList<>();
             boolean complete = true;
-            for(Participant p : battle.getParticipants()) {
+            for (Participant p : battle.getParticipants()) {
                 SWCPlayer swcp = pm.get(p.getMCID());
-                if(swcp != null && swcp.isOnline() && swcp.isReady() && !swcp.isIngame()) {
+                if (swcp != null && swcp.isOnline() && swcp.isReady() && !swcp.isIngame()) {
                     participants.add(swcp);
-                }
-                else {
+                } else {
                     complete = false;
                     break;
                 }
             }
-            if(complete) {
+            if (complete) {
                 Arena arena = free.get(random.nextInt(free.size()));
                 arena.startBattle(participants, BattleStartEvent.StartReason.QUEUE, battle);
             }

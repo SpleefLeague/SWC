@@ -20,8 +20,8 @@ import org.bson.Document;
  *
  * @author Jonas
  */
-public class Bracket extends DBEntity implements DBLoadable, DBSaveable{
-    
+public class Bracket extends DBEntity implements DBLoadable, DBSaveable {
+
     @DBLoad(fieldName = "hasStarted")
     @DBSave(fieldName = "hasStarted")
     private boolean hasStarted = false;
@@ -31,31 +31,32 @@ public class Bracket extends DBEntity implements DBLoadable, DBSaveable{
     @DBLoad(fieldName = "battles")
     @DBSave(fieldName = "battles")
     private Battle[] battles;
-    
+
     public ArrayList<Participant> getParticipants() {
         return participants;
     }
-    
+
     public Battle[] getBattles() {
         return battles;
     }
-    
+
     public Battle[] getOpenBattles() {
         Collection<Battle> open = new ArrayList<>();
-        for(Battle battle : battles) {
-            if(battle.isOpen()) {
+        for (Battle battle : battles) {
+            if (battle.isOpen()) {
                 open.add(battle);
             }
         }
         return open.toArray(new Battle[open.size()]);
     }
-    
+
     public Battle[] getPlayableBattles() {
         Collection<Battle> open = new ArrayList<>();
-btls:   for(Battle battle : battles) {
-            if(battle.isOpen()) {
-                for(Participant p : battle.getParticipants()) {
-                    if(SWC.getInstance().getPlayerManager().get(p.getMCID()) == null) {
+        btls:
+        for (Battle battle : battles) {
+            if (battle.isOpen()) {
+                for (Participant p : battle.getParticipants()) {
+                    if (SWC.getInstance().getPlayerManager().get(p.getMCID()) == null) {
                         continue btls;//Forgive me
                     }
                 }
@@ -64,7 +65,7 @@ btls:   for(Battle battle : battles) {
         }
         return open.toArray(new Battle[open.size()]);
     }
-    
+
     public void saveBattle(Battle battle) {
         Document filter = new Document();
         filter.put("_id", this.getObjectId());

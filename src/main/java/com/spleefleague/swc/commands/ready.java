@@ -25,18 +25,16 @@ public class ready extends BasicCommand {
 
     @Override
     protected void run(Player p, SLPlayer slp, Command cmd, String[] args) {
-        if(args.length == 0) {
+        if (args.length == 0) {
             SWCPlayer swcp = SWC.getInstance().getPlayerManager().get(p);
-            if(swcp.isReady()) {
+            if (swcp.isReady()) {
                 swcp.setReady(false);
                 success(p, "You are no longer ready.");
-            }
-            else {
+            } else {
                 swcp.setReady(true);
                 success(p, "You are now ready.");
             }
-        }
-        else {
+        } else {
             sendUsage(p);
         }
     }

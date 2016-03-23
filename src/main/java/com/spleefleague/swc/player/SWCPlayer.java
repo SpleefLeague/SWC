@@ -19,43 +19,43 @@ public class SWCPlayer extends GeneralPlayer {
 
     private Location disconnectLocation;
     private boolean ingame, frozen, requestingReset, requestingEndgame, ready;
-    
+
     public Participant getTournamentParticipant() {
         return Participant.getByMCID(this.getUniqueId());
     }
-    
+
     public void setIngame(boolean ingame) {
         this.ingame = ingame;
     }
-    
+
     public boolean isIngame() {
         return ingame;
     }
-    
+
     public void setFrozen(boolean frozen) {
         this.frozen = frozen;
     }
-    
+
     public boolean isFrozen() {
         return frozen;
     }
-    
+
     public void setRequestingReset(boolean requestingReset) {
         this.requestingReset = requestingReset;
     }
-    
+
     public boolean isRequestingReset() {
         return requestingReset;
     }
-    
+
     public void setRequestingEndgame(boolean requestingEndgame) {
         this.requestingEndgame = requestingEndgame;
     }
-    
+
     public boolean isRequestingEndgame() {
         return requestingEndgame;
     }
-    
+
     public void setReady(boolean ready) {
         this.ready = ready;
     }
@@ -63,9 +63,9 @@ public class SWCPlayer extends GeneralPlayer {
     public boolean isReady() {
         return ready;
     }
-    
+
     public Battle getCurrentBattle() {
-        if(SWC.getInstance().getBattleManager().isIngame(this)) {  
+        if (SWC.getInstance().getBattleManager().isIngame(this)) {
             return SWC.getInstance().getBattleManager().getBattle(this);
         }
         return null;

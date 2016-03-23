@@ -31,31 +31,30 @@ import org.bukkit.event.player.*;
 public class GameListener implements Listener {
 
     private static Listener instance;
-    
+
     public static void init() {
         if (instance == null) {
             instance = new GameListener();
             Bukkit.getPluginManager().registerEvents(instance, SWC.getInstance());
         }
     }
-    
+
     private GameListener() {
-        
+
     }
-    
+
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         SWCPlayer sp = SWC.getInstance().getPlayerManager().get(event.getPlayer());
-        if(sp != null) {
-            if(sp.isFrozen()) {
+        if (sp != null) {
+            if (sp.isFrozen()) {
                 Location spawn = sp.getCurrentBattle().getData(sp).getSpawn();
-                if(spawn.distanceSquared(sp.getLocation()) > 2) {
+                if (spawn.distanceSquared(sp.getLocation()) > 2) {
                     sp.teleport(spawn);
                 }
-            }
-            else if (!sp.isIngame()) {
+            } else if (!sp.isIngame()) {
                 SLPlayer slp = SpleefLeague.getInstance().getPlayerManager().get(event.getPlayer());
-                if(!(slp.getRank().hasPermission(Rank.MODERATOR) || slp.getRank() == Rank.ORGANIZER)) {
+                if (!(slp.getRank().hasPermission(Rank.MODERATOR) || slp.getRank() == Rank.ORGANIZER)) {
                     for (Arena arena : Arena.getAll()) {
                         if (arena.isTpBackSpectators() && arena.getBorder().isInArea(sp.getLocation())) {
                             Location loc = arena.getSpectatorSpawn();
@@ -67,46 +66,44 @@ public class GameListener implements Listener {
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 Battle battle = SWC.getInstance().getBattleManager().getBattle(sp);
                 Arena arena = battle.getArena();
-                if(!arena.getBorder().isInArea(sp.getLocation()) || PlayerUtil.isInLava(event.getPlayer()) || PlayerUtil.isInWater(event.getPlayer())) {
+                if (!arena.getBorder().isInArea(sp.getLocation()) || PlayerUtil.isInLava(event.getPlayer()) || PlayerUtil.isInWater(event.getPlayer())) {
                     battle.onArenaLeave(sp);
                 }
             }
         }
     }
-    
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onInteract(PlayerInteractEvent event) {
         SWCPlayer sp = SWC.getInstance().getPlayerManager().get(event.getPlayer());
-        if(sp != null && sp.isIngame()) {
+        if (sp != null && sp.isIngame()) {
             event.setCancelled(event.getClickedBlock() != null && event.getClickedBlock().getType() != Material.SNOW_BLOCK);
         }
     }
-    
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onBlockBreak(FakeBlockBreakEvent event) {
         SWCPlayer sp = SWC.getInstance().getPlayerManager().get(event.getPlayer());
-        if(sp.isIngame()) {
-            if(sp.getCurrentBattle().isInCountdown() || !sp.getCurrentBattle().getDisconnectPlayers().isEmpty()) {
+        if (sp.isIngame()) {
+            if (sp.getCurrentBattle().isInCountdown() || !sp.getCurrentBattle().getDisconnectPlayers().isEmpty()) {
                 event.setCancelled(true);
-            }
-            else {
+            } else {
                 event.setCancelled(!strongContains(sp.getCurrentBattle().getField().getBlocks(), event.getBlock()));
             }
         }
     }
-    
+
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         SWCPlayer sp = SWC.getInstance().getPlayerManager().get(event.getPlayer());
-        if(sp.isIngame()) {
+        if (sp.isIngame()) {
             event.setCancelled(event.getItemDrop().getItemStack().getType() == Material.DIAMOND_SPADE);
         }
     }
-    
+
     @EventHandler
     public void onFood(FoodLevelChangeEvent event) {
         event.setCancelled(true);
@@ -115,7 +112,7 @@ public class GameListener implements Listener {
     @EventHandler
     public void onShift(PlayerToggleSneakEvent e) {
         SWCPlayer sp = SWC.getInstance().getPlayerManager().get(e.getPlayer());
-        if(sp.isIngame() && !sp.getCurrentBattle().getDisconnectPlayers().isEmpty()) {
+        if (sp.isIngame() && !sp.getCurrentBattle().getDisconnectPlayers().isEmpty()) {
             e.setCancelled(true);
         }
     }
@@ -123,14 +120,14 @@ public class GameListener implements Listener {
     @EventHandler
     public void onShift(PlayerToggleFlightEvent e) {
         SWCPlayer sp = SWC.getInstance().getPlayerManager().get(e.getPlayer());
-        if(sp.isIngame() && !sp.getCurrentBattle().getDisconnectPlayers().isEmpty()) {
+        if (sp.isIngame() && !sp.getCurrentBattle().getDisconnectPlayers().isEmpty()) {
             e.setCancelled(true);
         }
     }
-    
+
     private <T> boolean strongContains(Collection<T> col, T object) {
-        for(T t : col) {
-            if(t == object) {
+        for (T t : col) {
+            if (t == object) {
                 return true;
             }
         }

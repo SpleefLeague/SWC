@@ -18,44 +18,44 @@ public class SWCBattleManager {
 
     private final Set<Battle> activeBattles;
     private final SWCQueue gameQueue;
-    
+
     public SWCBattleManager() {
         activeBattles = new HashSet<>();
         gameQueue = new SWCQueue();
     }
-    
+
     public void add(Battle battle) {
         activeBattles.add(battle);
     }
-    
+
     public void remove(Battle battle) {
         activeBattles.remove(battle);
     }
-    
+
     public Collection<Battle> getAll() {
         return activeBattles;
     }
-    
+
     public Battle getBattle(SWCPlayer player) {
-        for(Battle battle : activeBattles) {
-            for(SWCPlayer p : battle.getActivePlayers()) {
-                if(player == p) {
+        for (Battle battle : activeBattles) {
+            for (SWCPlayer p : battle.getActivePlayers()) {
+                if (player == p) {
                     return battle;
                 }
             }
         }
         return null;
     }
-    
+
     public Battle getBattle(Arena arena) {
-        for(Battle battle : activeBattles) {
-            if(battle.getArena() == arena) {
+        for (Battle battle : activeBattles) {
+            if (battle.getArena() == arena) {
                 return battle;
             }
         }
         return null;
     }
-    
+
     public boolean isIngame(SWCPlayer p) {
         return getBattle(p) != null;
     }

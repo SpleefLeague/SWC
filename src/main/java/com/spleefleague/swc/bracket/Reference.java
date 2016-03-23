@@ -22,50 +22,49 @@ import org.bson.Document;
  * @author Jonas
  */
 public class Reference extends DBEntity implements DBLoadable, DBSaveable {
-    
+
     @DBLoad(fieldName = "winner")
     @DBSave(fieldName = "winner")
     public Boolean winner;
     @DBLoad(fieldName = "battle")
     @DBSave(fieldName = "battle")
     public BattleReference battle;
-    
+
     public boolean isWinner() {
         return winner;
     }
-    
+
     public Participant getReferenced() {
         return (winner) ? battle.getBattle().getFirst() : battle.getBattle().getSecond();
     }
-    
+
     public static class RootReference extends Reference {
-        
+
         @DBLoad(fieldName = "player", typeConverter = UUIDStringConverter.class)
         @DBSave(fieldName = "player", typeConverter = UUIDStringConverter.class)
         private UUID referenced;
-        
+
         public RootReference() {
-            
+
         }
-        
+
         public RootReference(UUID referenced) {
             this.referenced = referenced;
         }
-        
+
         @Override
         public Participant getReferenced() {
             return Participant.getByPID(referenced);
         }
     }
-    
+
     public static class ReferenceConverter extends TypeConverter<Document, Reference> {
 
         @Override
         public Reference convertLoad(Document t) {
-            if(t.containsKey("player")) {
+            if (t.containsKey("player")) {
                 return EntityBuilder.deserialize(t, RootReference.class);
-            }
-            else {
+            } else {
                 return EntityBuilder.deserialize(t, Reference.class);
             }
         }

@@ -25,7 +25,7 @@ import org.bson.Document;
  * @author Jonas
  */
 public class Score extends DBEntity implements DBLoadable, DBSaveable {
-    
+
     @DBLoad(fieldName = "scores", typeConverter = HashMapReferenceScoreConverter.class)
     @DBSave(fieldName = "scores", typeConverter = HashMapReferenceScoreConverter.class)
     private final HashMap<Reference, Integer> scores = new HashMap<>();
@@ -35,61 +35,62 @@ public class Score extends DBEntity implements DBLoadable, DBSaveable {
     @DBSave(fieldName = "winner", typeConverter = TypeConverter.UUIDStringConverter.class)
     @DBLoad(fieldName = "winner", typeConverter = TypeConverter.UUIDStringConverter.class)
     private UUID winner;
-    
-    public void end(Participant winner){
+
+    public void end(Participant winner) {
         isOver = true;
         this.winner = winner.getPID();
     }
-    
+
     protected void reset() {
         isOver = false;
         scores.clear();
     }
-    
+
     public void setScore(int score, Participant p) {
-        for(Reference r : scores.keySet()) {
-            if(r.getReferenced() == p) {
+        for (Reference r : scores.keySet()) {
+            if (r.getReferenced() == p) {
                 scores.put(r, score);
                 return;
             }
         }
         setScore(score, new RootReference(p.getPID()));
     }
-    
+
     public void setScore(int score, Reference r) {
-        if(!isOver){
-            if(scores.containsKey(r))
+        if (!isOver) {
+            if (scores.containsKey(r)) {
                 scores.remove(r);
+            }
             scores.put(r, score);
         }
     }
-    
+
     public int getScore(Participant p) {
-        for(Reference r : scores.keySet()) {
-            if(r.getReferenced() == p) {
+        for (Reference r : scores.keySet()) {
+            if (r.getReferenced() == p) {
                 return scores.get(r);
             }
         }
         return -1;
     }
-    
+
     public Participant getFirst() {
         Participant winner = null;
-        if(isOver){
+        if (isOver) {
             winner = Participant.getByPID(this.winner);
         }
         return winner;
     }
-    
+
     public Participant getSecond() {
         Participant second = null;
         int points = -1;
-        if(isOver){
-            for(Entry<Reference, Integer> entry : scores.entrySet()) {
+        if (isOver) {
+            for (Entry<Reference, Integer> entry : scores.entrySet()) {
                 Participant referenced = entry.getKey().getReferenced();
-                if(referenced != null) {
-                    if(referenced.getPID() != winner) {
-                        if(entry.getValue() > points) {
+                if (referenced != null) {
+                    if (referenced.getPID() != winner) {
+                        if (entry.getValue() > points) {
                             second = referenced;
                             points = entry.getValue();
                         }
@@ -99,36 +100,36 @@ public class Score extends DBEntity implements DBLoadable, DBSaveable {
         }
         return second;
     }
-    
+
     public boolean isOver() {
         return isOver;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Score{");
-        for(Reference reference : scores.keySet()) {
+        for (Reference reference : scores.keySet()) {
             sb.append(reference.getReferenced()).append(":").append(scores.get(reference)).append(" | ");
         }
-        if(scores.size() > 0)
+        if (scores.size() > 0) {
             sb.replace(sb.length() - 3, sb.length(), "");
+        }
         sb.append("}");
         return sb.toString();
     }
-    
+
     public static class HashMapReferenceScoreConverter extends TypeConverter<List<Document>, HashMap<Reference, Integer>> {
 
         @Override
         public HashMap<Reference, Integer> convertLoad(List<Document> t) {
             HashMap<Reference, Integer> map = new HashMap<>();
-            for(Document document : t) {
+            for (Document document : t) {
                 Document refdoc = document.get("reference", Document.class);
                 Reference ref;
-                if(refdoc.containsKey("player")) {
+                if (refdoc.containsKey("player")) {
                     ref = EntityBuilder.load(refdoc, RootReference.class);
-                }
-                else {
+                } else {
                     ref = EntityBuilder.load(refdoc, Reference.class);
                 }
                 map.put(ref, document.get("score", Integer.class));
@@ -139,7 +140,7 @@ public class Score extends DBEntity implements DBLoadable, DBSaveable {
         @Override
         public List<Document> convertSave(HashMap<Reference, Integer> v) {
             List<Document> list = new ArrayList<>();
-            for(Entry<Reference, Integer> e : v.entrySet()) {
+            for (Entry<Reference, Integer> e : v.entrySet()) {
                 Document doc = new Document("score", e.getValue());
                 Document ref = EntityBuilder.serialize(e.getKey()).get("$set", Document.class);
                 doc.put("reference", ref);

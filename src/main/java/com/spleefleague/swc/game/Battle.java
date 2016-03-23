@@ -71,7 +71,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     private boolean inCountdown = false;
     private final FakeArea spawnCages, field;
     private final com.spleefleague.swc.bracket.Battle match;
-    
+
     protected Battle(Arena arena, List<SWCPlayer> players, com.spleefleague.swc.bracket.Battle match) {
         this.match = match;
         this.arena = arena;
@@ -81,8 +81,8 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         this.data = new LinkedHashMap<>();
         this.spawnCages = new FakeArea();
         this.field = new FakeArea();
-        for(Area area : arena.getField()) {
-            for(Block block : area.getBlocks()) {
+        for (Area area : arena.getField()) {
+            for (Block block : area.getBlocks()) {
                 this.field.addBlock(new FakeBlock(block.getLocation(), Material.SNOW_BLOCK));
             }
         }
@@ -93,7 +93,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     public Arena getArena() {
         return arena;
     }
-    
+
     public com.spleefleague.swc.bracket.Battle getMatch() {
         return match;
     }
@@ -123,11 +123,11 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         SLPlayer slp = SpleefLeague.getInstance().getPlayerManager().get(sp.getPlayer());
         slp.setState(PlayerState.SPECTATING);
         slp.addChatChannel(cc);
-        for(SWCPlayer spl : getActivePlayers()) {
+        for (SWCPlayer spl : getActivePlayers()) {
             spl.showPlayer(sp.getPlayer());
             sp.showPlayer(spl.getPlayer());
         }
-        for(SWCPlayer spl : spectators) {
+        for (SWCPlayer spl : spectators) {
             spl.showPlayer(sp);
             sp.showPlayer(spl);
         }
@@ -141,7 +141,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
 
     public void removeSpectator(SWCPlayer sp) {
         List<Player> ingamePlayers = new ArrayList<>();
-        for(SWCPlayer p : getActivePlayers()) {
+        for (SWCPlayer p : getActivePlayers()) {
             sp.getPlayer().hidePlayer(p.getPlayer());
             p.getPlayer().hidePlayer(sp.getPlayer());
             ingamePlayers.add(p.getPlayer());
@@ -157,11 +157,11 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
             list.clear();
             ingamePlayers.forEach((Player p) -> {
                 SLPlayer generalPlayer = SpleefLeague.getInstance().getPlayerManager().get(p);
-                list.add(new PlayerInfoData(WrappedGameProfile.fromPlayer(p), ((CraftPlayer)p).getHandle().ping, EnumWrappers.NativeGameMode.SURVIVAL, WrappedChatComponent.fromText(generalPlayer.getRank().getColor() + generalPlayer.getName())));
+                list.add(new PlayerInfoData(WrappedGameProfile.fromPlayer(p), ((CraftPlayer) p).getHandle().ping, EnumWrappers.NativeGameMode.SURVIVAL, WrappedChatComponent.fromText(generalPlayer.getRank().getColor() + generalPlayer.getName())));
             });
             packet.setData(list);
             packet.sendPacket(sp.getPlayer());
-        },10);
+        }, 10);
         resetPlayer(sp);
     }
 
@@ -179,9 +179,9 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
             disconnectFreeze(swcPlayer);
         });
         Bukkit.getScheduler().runTaskLater(SWC.getInstance(), () -> {
-            for(SWCPlayer swcPlayer : players) {
-                if(swcPlayer.getUniqueId().equals(sp.getUniqueId())) {
-                    if(disconnects.contains(sp)) {
+            for (SWCPlayer swcPlayer : players) {
+                if (swcPlayer.getUniqueId().equals(sp.getUniqueId())) {
+                    if (disconnects.contains(sp)) {
                         //Failsafe.
                         disconnects.remove(sp);
                     }
@@ -198,7 +198,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         swcPlayer.setAllowFlight(true);
         swcPlayer.setFlying(true);
         swcPlayer.setFlySpeed(0);
-        swcPlayer.teleport(swcPlayer.getLocation().add(0, 0.1 ,0));
+        swcPlayer.teleport(swcPlayer.getLocation().add(0, 0.1, 0));
         swcPlayer.getInventory().clear();
     }
 
@@ -225,13 +225,13 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         });
         players.add(sp);
         PlayerData playerData = null;
-        for(PlayerData pd : data.values()) {
-            if(pd.getPlayer().getUniqueId().equals(sp.getUniqueId())) {
+        for (PlayerData pd : data.values()) {
+            if (pd.getPlayer().getUniqueId().equals(sp.getUniqueId())) {
                 playerData = pd;
                 break;
             }
         }
-        if(playerData == null) {
+        if (playerData == null) {
             getActivePlayers().forEach((SWCPlayer swcPlayer) -> swcPlayer.kickPlayer("An error occurred (no PlayerData)."));
             cancel();
             return;
@@ -260,8 +260,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
                 if (secondsLeft > 0) {
                     ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), secondsLeft + "...", cc);
                     secondsLeft--;
-                }
-                else {
+                } else {
                     ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), "GO!", cc);
                     for (SWCPlayer sp : getActivePlayers()) {
                         sp.setFrozen(false);
@@ -287,7 +286,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     }
 
     public void removePlayer(SWCPlayer sp, boolean surrender) {
-        if(!surrender) {
+        if (!surrender) {
             for (SWCPlayer pl : getActivePlayers()) {
                 pl.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.ERROR.buildTheme(false) + sp.getName() + " has left the game!");
             }
@@ -315,7 +314,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
 
     private void resetPlayer(SWCPlayer sp) {
         SLPlayer slp = SpleefLeague.getInstance().getPlayerManager().get(sp.getPlayer());
-        if(slp == null) {
+        if (slp == null) {
             return;
         }
         FakeBlockHandler.removeArea(spawnCages, slp.getPlayer());
@@ -323,8 +322,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
         FakeBlockHandler.addArea(arena.getDefaultSnow(), false, slp.getPlayer());
         if (spectators.contains(sp)) {
             spectators.remove(sp);
-        }
-        else {
+        } else {
             sp.setIngame(false);
             sp.setFrozen(false);
             sp.setRequestingReset(false);
@@ -341,18 +339,16 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
 
     public void end(SWCPlayer winner, EndReason reason) {
         saveGameHistory(winner);
-        if(reason == EndReason.CANCEL) {
-            if(reason == EndReason.CANCEL) {
+        if (reason == EndReason.CANCEL) {
+            if (reason == EndReason.CANCEL) {
                 ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), Theme.INCOGNITO.buildTheme(false) + "The battle has been cancelled by a moderator.", cc);
             }
             match.reset();
-        }
-        else if(reason != EndReason.ENDGAME) {
+        } else if (reason != EndReason.ENDGAME) {
             announceWinner(winner);
             match.end(winner.getTournamentParticipant());
             SWC.getInstance().getBracket().saveBattle(match);
-        }
-        else {
+        } else {
             match.reset();
         }
         for (SWCPlayer sp : new ArrayList<>(spectators)) {
@@ -387,8 +383,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     public void onArenaLeave(SWCPlayer player) {
         if (isInCountdown() || !getDisconnectPlayers().isEmpty()) {
             player.teleport(data.get(player).getSpawn());
-        }
-        else {
+        } else {
             for (SWCPlayer sp : getActivePlayers()) {
                 if (sp != player) {
                     PlayerData playerdata = this.data.get(sp);
@@ -402,8 +397,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
                         }
                         ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), Theme.INFO.buildTheme(false) + sp.getName() + " has won round " + round, cc);
                         startRound();
-                    }
-                    else {
+                    } else {
                         end(sp, EndReason.NORMAL);
                     }
                 }
@@ -422,16 +416,16 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     }
 
     public void start(StartReason reason) {
-        for(SWCPlayer player : players) {
+        for (SWCPlayer player : players) {
             GamePlugin.unspectateGlobal(player);
-            GamePlugin.dequeueGlobal(player);    
+            GamePlugin.dequeueGlobal(player);
         }
         BattleStartEvent event = new BattleStartEvent(this, reason);
         Bukkit.getPluginManager().callEvent(event);
-        if(!event.isCancelled()) {
+        if (!event.isCancelled()) {
             arena.registerGameStart();
-            if(arena.getScoreboards() != null) {
-                for(com.spleefleague.swc.game.scoreboards.Scoreboard scoreboard : arena.getScoreboards()) {
+            if (arena.getScoreboards() != null) {
+                for (com.spleefleague.swc.game.scoreboards.Scoreboard scoreboard : arena.getScoreboards()) {
                     scoreboard.setScore(new int[arena.getSize()]);
                 }
             }
@@ -450,12 +444,11 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
                 SWCPlayer sp = players.get(i);
                 if (i == 0) {
                     playerNames = ChatColor.RED + sp.getName();
-                }
-                else if (i == players.size() - 1) {
+                } else if (i == players.size() - 1) {
                     playerNames += ChatColor.YELLOW + " vs. " + ChatColor.RED + sp.getName();
                 }
                 sp.setWalkSpeed(0.2F);
-                match.getScore().setScore(0, sp.getTournamentParticipant());    
+                match.getScore().setScore(0, sp.getTournamentParticipant());
                 sp.setReady(false);
                 sp.setIngame(true);
                 sp.setFrozen(true);
@@ -494,20 +487,20 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
             startRound();
         }
     }
-    
+
     private void hidePlayers() {
         List<SWCPlayer> battlePlayers = getActivePlayers();
         battlePlayers.addAll(spectators);
-        for(SWCPlayer sjp : SWC.getInstance().getPlayerManager().getAll()) {
+        for (SWCPlayer sjp : SWC.getInstance().getPlayerManager().getAll()) {
             hidePlayers(sjp);
         }
     }
-    
+
     private void hidePlayers(SWCPlayer target) {
         List<SWCPlayer> battlePlayers = getActivePlayers();
         battlePlayers.addAll(spectators);
-        for(SWCPlayer active : battlePlayers) {
-            if(!battlePlayers.contains(target)) {
+        for (SWCPlayer active : battlePlayers) {
+            if (!battlePlayers.contains(target)) {
                 target.hidePlayer(active.getPlayer());
                 active.hidePlayer(target.getPlayer());
             }
@@ -533,8 +526,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
                 if (secondsLeft > 0) {
                     ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), secondsLeft + "...", cc);
                     secondsLeft--;
-                }
-                else {
+                } else {
                     ChatManager.sendMessage(SWC.getInstance().getChatPrefix(), "GO!", cc);
                     for (SWCPlayer sp : getActivePlayers()) {
                         sp.setFrozen(false);
@@ -581,25 +573,25 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     }
 
     private void createSpawnCages() {
-        for(FakeBlock block : spawnCages.getBlocks()) {
+        for (FakeBlock block : spawnCages.getBlocks()) {
             block.setType(Material.GLASS);
         }
         FakeBlockHandler.update(spawnCages);
-    }    
+    }
 
     private void removeSpawnCages() {
-        for(FakeBlock block : spawnCages.getBlocks()) {
+        for (FakeBlock block : spawnCages.getBlocks()) {
             block.setType(Material.AIR);
         }
         FakeBlockHandler.update(spawnCages);
     }
-    
+
     private void getSpawnCageBlocks() {
-        for(Location spawn : arena.getSpawns()) {
+        for (Location spawn : arena.getSpawns()) {
             spawnCages.add(getCageBlocks(spawn, Material.AIR));
         }
     }
-    
+
     private FakeArea getCageBlocks(Location loc, Material m) {
         loc = loc.getBlock().getLocation();
         FakeArea area = new FakeArea();
@@ -620,23 +612,22 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     public boolean isInCountdown() {
         return inCountdown;
     }
-    
+
     public FakeArea getField() {
         return field;
     }
 
     private void announceWinner(SWCPlayer winner) {
         SWCPlayer loser = null;
-        for(SWCPlayer swcp : players) {
-            if(swcp != winner) {
+        for (SWCPlayer swcp : players) {
+            if (swcp != winner) {
                 loser = swcp;
                 break;
             }
         }
-        if(loser != null) {
+        if (loser != null) {
             Bukkit.broadcastMessage(SWC.getInstance().getChatPrefix() + " " + ChatColor.RED + winner.getName() + ChatColor.YELLOW + " won against " + ChatColor.RED + loser.getName());
-        }
-        else {
+        } else {
             Bukkit.broadcastMessage(SWC.getInstance().getChatPrefix() + " " + ChatColor.RED + winner.getName() + ChatColor.YELLOW + " has won the match!");
         }
     }
@@ -653,7 +644,7 @@ public class Battle implements com.spleefleague.core.queue.Battle<Arena, SWCPlay
     public int getDuration() {
         return ticksPassed;
     }
-    
+
     private static ItemStack getShovel() {
         net.minecraft.server.v1_8_R3.ItemStack stack = CraftItemStack.asNMSCopy(new ItemStack(Material.DIAMOND_SPADE));
         NBTTagCompound tag = stack.hasTag() ? stack.getTag() : new NBTTagCompound();

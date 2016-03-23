@@ -40,11 +40,11 @@ public class SWC extends GamePlugin {
     private Bracket bracket;
     private PlayerManager<SWCPlayer> playerManager;
     private SWCBattleManager battleManager;
-    
+
     public SWC() {
         super("[SWC]", ChatColor.GRAY + "[" + ChatColor.GOLD + "SWC" + ChatColor.GRAY + "]" + ChatColor.RESET);
     }
-    
+
     @Override
     public void start() {
         instance = this;
@@ -58,20 +58,20 @@ public class SWC extends GamePlugin {
         battleManager = new SWCBattleManager();
         CommandLoader.loadCommands(this, "com.spleefleague.swc.commands");
     }
-    
+
     @Override
     public void stop() {
         EntityBuilder.save(bracket, getPluginDB().getCollection("Brackets"));
     }
-    
+
     public PlayerManager<SWCPlayer> getPlayerManager() {
         return playerManager;
     }
-    
+
     public SWCBattleManager getBattleManager() {
         return battleManager;
     }
-    
+
     public Bracket getBracket() {
         return bracket;
     }
@@ -80,31 +80,30 @@ public class SWC extends GamePlugin {
     public boolean spectate(Player target, Player p) {
         SWCPlayer tsjp = getPlayerManager().get(target);
         SWCPlayer sjp = getPlayerManager().get(p);
-        if(tsjp.isIngame()) {
+        if (tsjp.isIngame()) {
             tsjp.getCurrentBattle().addSpectator(sjp);
             return true;
-        }
-        else {
+        } else {
             p.sendMessage(SWC.getInstance().getChatPrefix() + Theme.ERROR.buildTheme(false) + " You can only spectate arenas you have already visited!");
             return false;
         }
     }
-    
+
     @Override
     public void unspectate(Player p) {
         SWCPlayer sjp = getPlayerManager().get(p);
-        for(Battle battle : getBattleManager().getAll()) {
-            if(battle.isSpectating(sjp)) {
+        for (Battle battle : getBattleManager().getAll()) {
+            if (battle.isSpectating(sjp)) {
                 battle.removeSpectator(sjp);
             }
         }
     }
-    
+
     @Override
     public boolean isSpectating(Player p) {
         SWCPlayer sjp = getPlayerManager().get(p);
-        for(Battle battle : getBattleManager().getAll()) {
-            if(battle.isSpectating(sjp)) {
+        for (Battle battle : getBattleManager().getAll()) {
+            if (battle.isSpectating(sjp)) {
                 return true;
             }
         }
@@ -121,18 +120,18 @@ public class SWC extends GamePlugin {
     public void cancel(Player p) {
         SWCPlayer sp = getPlayerManager().get(p);
         Battle battle = getBattleManager().getBattle(sp);
-        if(battle != null) {
-            battle.cancel();    
+        if (battle != null) {
+            battle.cancel();
             ChatManager.sendMessage(SWC.getInstance().getChatPrefix() + Theme.SUPER_SECRET.buildTheme(false) + " The battle on " + battle.getArena().getName() + " has been cancelled.", ChatChannel.STAFF_NOTIFICATIONS);
         }
     }
-    
+
     @Override
     public void surrender(Player p) {
         SWCPlayer sp = getPlayerManager().get(p);
         Battle battle = getBattleManager().getBattle(sp);
-        if(battle != null) {
-            for(SWCPlayer active : battle.getActivePlayers()) {
+        if (battle != null) {
+            for (SWCPlayer active : battle.getActivePlayers()) {
                 active.sendMessage(SWC.getInstance().getChatPrefix() + Theme.SUPER_SECRET.buildTheme(false) + " " + p.getName() + " has surrendered!");
             }
             battle.removePlayer(sp, true);
@@ -149,17 +148,17 @@ public class SWC extends GamePlugin {
         SWCPlayer sp = getPlayerManager().get(p);
         return getBattleManager().isIngame(sp);
     }
-    
+
     @Override
     public void cancelAll() {
-        for(Battle battle : new ArrayList<>(battleManager.getAll())) {
+        for (Battle battle : new ArrayList<>(battleManager.getAll())) {
             battle.cancel();
         }
     }
 
     @Override
     public void printStats(Player p) {
-        
+
     }
 
     @Override
@@ -177,8 +176,7 @@ public class SWC extends GamePlugin {
             }
             if (shouldEnd) {
                 battle.end(null, BattleEndEvent.EndReason.ENDGAME);
-            }
-            else {
+            } else {
                 for (SWCPlayer spleefplayer : battle.getActivePlayers()) {
                     if (!spleefplayer.isRequestingEndgame()) {
                         spleefplayer.sendMessage(SWC.getInstance().getChatPrefix() + " " + Theme.WARNING.buildTheme(false) + "Your opponent wants to end this game. To agree enter " + ChatColor.YELLOW + "/endgame.");
@@ -193,20 +191,20 @@ public class SWC extends GamePlugin {
     public void setQueueStatus(boolean open) {
         queueOpen = open;
     }
-    
+
     @Override
     public void syncSave(Player p) {
         SWCPlayer slp = playerManager.get(p);
-        if(slp != null) {
+        if (slp != null) {
             EntityBuilder.save(slp, getPluginDB().getCollection("Players"));
         }
     }
-    
+
     @Override
     public MongoDatabase getPluginDB() {
         return SpleefLeague.getInstance().getMongo().getDatabase("SWC");
     }
-    
+
     public static SWC getInstance() {
         return instance;
     }

@@ -22,27 +22,25 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-
-
 /**
  *
  * @author Jonas
  */
 public class EnvironmentListener implements Listener {
-    
+
     private static Listener instance;
-    
+
     public static void init() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new EnvironmentListener();
             Bukkit.getPluginManager().registerEvents(instance, SWC.getInstance());
         }
     }
-    
+
     private EnvironmentListener() {
-        
+
     }
-    
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent event) {
         Arena.getAll().stream().filter(arena -> arena != null && arena.getDefaultSnow() != null).forEach(arena -> FakeBlockHandler.addArea(arena.getDefaultSnow(), false, event.getPlayer()));

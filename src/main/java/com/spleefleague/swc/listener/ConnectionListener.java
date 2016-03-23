@@ -32,31 +32,31 @@ import org.bukkit.event.player.PlayerQuitEvent;
  * @author Jonas
  */
 public class ConnectionListener implements Listener {
-    
+
     private static Listener instance;
-    
+
     public static void init() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new ConnectionListener();
             Bukkit.getPluginManager().registerEvents(instance, SWC.getInstance());
         }
     }
-    
+
     private ConnectionListener() {
-        
+
     }
-    
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(PlayerQuitEvent event) {
         SWCPlayer sp = SWC.getInstance().getPlayerManager().get(event.getPlayer());
-        if(sp.isIngame()) {
+        if (sp.isIngame()) {
             SWC.getInstance().getBattleManager().getBattle(sp).playerQuit(sp);
         }
     }
 
     @EventHandler
     public void onJoin(GeneralPlayerLoadedEvent e) {
-        if(e.getGeneralPlayer() instanceof SLPlayer) {
+        if (e.getGeneralPlayer() instanceof SLPlayer) {
             SWCPlayer swcPlayer = SWC.getInstance().getPlayerManager().get(e.getPlayer());
             for (Battle battle : SWC.getInstance().getBattleManager().getAll()) {
                 for (SWCPlayer player : battle.getDisconnectPlayers()) {
@@ -68,27 +68,26 @@ public class ConnectionListener implements Listener {
             }
         }
     }
-    
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         List<Player> ingamePlayers = new ArrayList<>();
         List<Battle> toCancel = new ArrayList<>();//Workaround
-        for(Battle battle : SWC.getInstance().getBattleManager().getAll()) {
-            for(SWCPlayer p : battle.getActivePlayers()) {
-                if(p.getPlayer() != null) {
+        for (Battle battle : SWC.getInstance().getBattleManager().getAll()) {
+            for (SWCPlayer p : battle.getActivePlayers()) {
+                if (p.getPlayer() != null) {
                     event.getPlayer().hidePlayer(p.getPlayer());
                     p.getPlayer().hidePlayer(event.getPlayer());
                     ingamePlayers.add(p.getPlayer());
-                }
-                else {
+                } else {
                     toCancel.add(battle);
                     break;
                 }
             }
         }
-        for(Battle battle : toCancel) {
-            for(SWCPlayer p : battle.getActivePlayers()) {
-                if(p.getPlayer() != null) {
+        for (Battle battle : toCancel) {
+            for (SWCPlayer p : battle.getActivePlayers()) {
+                if (p.getPlayer() != null) {
                     p.kickPlayer("An error has occured. Please reconnect");
                 }
             }
@@ -109,6 +108,6 @@ public class ConnectionListener implements Listener {
             });
             packet.setData(list);
             packet.sendPacket(event.getPlayer());
-        },10);
+        }, 10);
     }
 }

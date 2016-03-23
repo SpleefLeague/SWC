@@ -23,19 +23,19 @@ public class matches extends BasicCommand {
 
     @Override
     protected void run(Player player, SLPlayer slPlayer, Command command, String[] strings) {
-        if(SWC.getInstance().getBattleManager().getAll().isEmpty()) {
+        if (SWC.getInstance().getBattleManager().getAll().isEmpty()) {
             error(slPlayer, "There are currently no SWC matches running!");
             return;
         }
         player.sendMessage(ChatColor.DARK_GRAY + "[========== " + ChatColor.GRAY + "Current SWC Matches" + ChatColor.DARK_GRAY + " ==========]");
         SWC.getInstance().getBattleManager().getAll().forEach((Battle battle) -> {
-            if(battle.getActivePlayers().isEmpty()) {
+            if (battle.getActivePlayers().isEmpty()) {
                 return;
             }
             ComponentBuilder message = new ComponentBuilder(SWC.getInstance().getChatPrefix());
             battle.getActivePlayers().forEach((SWCPlayer swcPlayer) -> {
                 message.append(" " + swcPlayer.getName()).color(net.md_5.bungee.api.ChatColor.GREEN);
-                if(battle.getActivePlayers().indexOf(swcPlayer) != (battle.getActivePlayers().size() -1)) {
+                if (battle.getActivePlayers().indexOf(swcPlayer) != (battle.getActivePlayers().size() - 1)) {
                     message.append(" vs. ").color(net.md_5.bungee.api.ChatColor.DARK_GRAY);
                 }
             });

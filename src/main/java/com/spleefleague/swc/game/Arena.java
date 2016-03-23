@@ -43,7 +43,7 @@ import org.bukkit.entity.Player;
  * @author Jonas
  */
 public class Arena extends DBEntity implements DBLoadable, DBSaveable, QueueableArena<SWCPlayer> {
-    
+
     @DBLoad(fieldName = "border")
     private Area border;
     private Area[] field;
@@ -70,114 +70,111 @@ public class Arena extends DBEntity implements DBLoadable, DBSaveable, Queueable
     private Area area;
     private int runningGames = 0;
     private FakeArea defaultSnow;
-    
-    
+
     public Location[] getSpawns() {
         return spawns;
     }
-    
+
     public Area getBorder() {
         return border;
     }
-    
+
     public FakeArea getDefaultSnow() {
         return defaultSnow;
     }
-    
+
     @DBLoad(fieldName = "field")
     public void setField(Area[] field) {
         this.field = field;
         defaultSnow = new FakeArea();
-        for(Area area : field) {
-            for(Block block : area.getBlocks()) {
+        for (Area area : field) {
+            for (Block block : area.getBlocks()) {
                 defaultSnow.addBlock(new FakeBlock(block.getLocation(), Material.SNOW_BLOCK));
             }
         }
         FakeBlockHandler.addArea(defaultSnow, false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
     }
-    
+
     public Area[] getField() {
         return field;
     }
-    
+
     public Location getSpectatorSpawn() {
         return spectatorSpawn;
     }
-    
+
     public String getCreator() {
         return creator;
     }
-    
+
     public Scoreboard[] getScoreboards() {
         return scoreboards;
     }
-    
+
     @Override
     public String getName() {
         return name;
     }
-    
+
     @Override
     public boolean isOccupied() {
         return false;
     }
-    
+
     public int getRunningGamesCount() {
         return runningGames;
     }
-    
+
     public void registerGameStart() {
         runningGames++;
     }
-    
+
     public void registerGameEnd() {
         runningGames--;
     }
-    
+
     public Area getArea() {
         return area;
     }
-    
+
     public boolean isRated() {
         return false;
     }
-    
+
     public boolean isTpBackSpectators() {
         return tpBackSpectators;
     }
-    
+
     @Override
     public boolean isPaused() {
         return paused;
     }
-    
+
     public void setPaused(boolean paused) {
         this.paused = paused;
     }
-    
+
     public int getMaxRating() {
         return maxRating;
     }
-    
+
     @Override
     public int getSize() {
         return spawns.length;
     }
-    
+
     public Dynamic<List<String>> getDynamicDescription() {
         return (SLPlayer slp) -> {
             List<String> description = new ArrayList<>();
             SWCPlayer sjp = SWC.getInstance().getPlayerManager().get(slp.getUniqueId());
-            if(Arena.this.isAvailable(sjp)) {
-                if(Arena.this.isPaused()) {
+            if (Arena.this.isAvailable(sjp)) {
+                if (Arena.this.isPaused()) {
                     description.add(ChatColor.RED + "This arena is");
                     description.add(ChatColor.RED + "currently paused.");
-                }
-                else if(getRunningGamesCount() == 0) {
+                } else if (getRunningGamesCount() == 0) {
                     description.add(ChatColor.DARK_GRAY + "" + ChatColor.ITALIC + "Click to join the queue");
                 }
-            }
-            else {
+            } else {
                 description.add(ChatColor.RED + "You have not discovered");
                 description.add(ChatColor.RED + "this arena yet.");
             }
@@ -189,43 +186,43 @@ public class Arena extends DBEntity implements DBLoadable, DBSaveable, Queueable
     public boolean isAvailable(SWCPlayer sp) {
         return true;
     }
-    
+
     @Override
     public boolean isQueued() {
         return queued;
     }
-    
+
     public Battle startBattle(List<SWCPlayer> players, StartReason reason, com.spleefleague.swc.bracket.Battle bracketBattle) {
-        if(!isOccupied()) { //Shouldn't be necessary
+        if (!isOccupied()) { //Shouldn't be necessary
             Battle battle = new Battle(this, players, bracketBattle);
             battle.start(reason);
             return battle;
         }
         return null;
     }
-    
+
     private static Map<String, Arena> arenas;
-    
+
     public static Arena byName(String name) {
         Arena arena = arenas.get(name);
-        if(arena == null) {
-            for(Arena a : arenas.values()) {
-                if(a.getName().equalsIgnoreCase(name)) {
+        if (arena == null) {
+            for (Arena a : arenas.values()) {
+                if (a.getName().equalsIgnoreCase(name)) {
                     arena = a;
                 }
             }
         }
         return arena;
     }
-    
+
     public static Collection<Arena> getAll() {
         return arenas.values();
     }
-    
-    public static void init(){
+
+    public static void init() {
         arenas = new HashMap<>();
         MongoCursor<Document> dbc = SpleefLeague.getInstance().getMongo().getDatabase("SuperSpleef").getCollection("Arenas").find(new Document("swc", true)).iterator();
-        while(dbc.hasNext()) {
+        while (dbc.hasNext()) {
             Arena arena = EntityBuilder.load(dbc.next(), Arena.class);
             arenas.put(arena.getName(), arena);
         }
